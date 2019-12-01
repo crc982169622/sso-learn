@@ -13,6 +13,7 @@
 <body>
 
 <form action="/login" method="post">
+    <input type="hidden" name="url" value="${url}" />
     用户名：<input name="userName" /><br/>
     密码：<input name="password" type="password" /><br/>
     <button type="submit">登录</button>

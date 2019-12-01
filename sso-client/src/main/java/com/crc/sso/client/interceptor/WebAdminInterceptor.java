@@ -1,10 +1,10 @@
 package com.crc.sso.client.interceptor;
 
 import com.crc.sso.client.domain.User;
-import com.crc.sso.client.util.CookieUtils;
+import com.crc.sso.client.service.consumer.RedisCacheService;
+import com.crc.sso.common.util.CookieUtils;
 import com.crc.sso.common.util.MapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class WebAdminInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisCacheService redisCacheService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
@@ -50,9 +50,9 @@ public class WebAdminInterceptor implements HandlerInterceptor {
         else {
             String token = CookieUtils.getCookieValue(request, "token");
             if (token != null && !token.isEmpty()) {
-                String userName = (String)redisTemplate.opsForValue().get(token);
+                String userName = redisCacheService.get(token);
                 if (userName != null && !userName.isEmpty()) {
-                    String json = (String)redisTemplate.opsForValue().get(userName);
+                    String json = redisCacheService.get(userName);
                     if (json != null) {
                         try {
                             user = MapperUtils.json2pojo(json, User.class);

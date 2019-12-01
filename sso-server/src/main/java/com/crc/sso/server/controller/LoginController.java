@@ -5,6 +5,7 @@ import com.crc.sso.common.util.JsonUtils;
 import com.crc.sso.common.util.MapperUtils;
 import com.crc.sso.server.domain.User;
 import com.crc.sso.server.service.LoginService;
+import com.crc.sso.server.service.consumer.RedisCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,7 @@ public class LoginController {
     private LoginService loginService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisCacheService redisCacheService;
 
     /**
      * 跳转登录页
@@ -42,10 +43,10 @@ public class LoginController {
         String token = CookieUtils.getCookieValue(request, "token");
         //token不为空可能已登录,从redis获取账号
         if (token != null && token.trim().length() != 0) {
-            String userName = (String)redisTemplate.opsForValue().get(token);
+            String userName = (String)redisCacheService.get(token);
             //如果账号不为空，从redis获取该账号的个人信息
             if (userName != null && userName.trim().length() != 0) {
-                String json = (String) redisTemplate.opsForValue().get(userName);
+                String json = (String) redisCacheService.get(userName);
                 if (json != null) {
                     User user = null;
                     try {
@@ -63,6 +64,7 @@ public class LoginController {
                 }
             }
         }
+        request.setAttribute("url", url);
         return "login";
     }
 
@@ -76,9 +78,9 @@ public class LoginController {
         if (user != null) {
             String token = UUID.randomUUID().toString();
             //将token放入缓存
-            redisTemplate.opsForValue().set(token, userName, 60*60*24);
+            redisCacheService.put(token, userName, 60*60*24);
             CookieUtils.setCookie(request, response,"token", token, 60*60*24);
-            if (url != null)
+            if (url != null && !url.equals(""))
                 return "redirect:" + url;
         }
         return "redirect:/login";
