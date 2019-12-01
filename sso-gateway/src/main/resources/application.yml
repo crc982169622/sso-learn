@@ -1,0 +1,29 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: sso-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          #\u542F\u7528\u57FA\u4E8E\u670D\u52A1\u53D1\u73B0\u7684\u8DEF\u7531\u5B9A\u4F4D
+          enabled: true
+          #\u542F\u7528\u670D\u52A1\u5B9E\u4F8Bid\u540D\u79F0\u5C0F\u5199\u652F\u6301
+          lower-case-service-id: true
+      routes:
+      - id: sso-server
+        uri: http://localhost:8080
+        predicates:
+        - Path=/sso-server/**
+        filters:
+        - StripPrefix=1
+      - id: sso-client
+        uri: http://localhost:8081
+        predicates:
+        - Path=/sso-client/**
+        filters:
+        - StripPrefix=1
+
+hystrix.command.fallbackcmd.execution.isolation.thread.timeoutInMilliseconds: 1000

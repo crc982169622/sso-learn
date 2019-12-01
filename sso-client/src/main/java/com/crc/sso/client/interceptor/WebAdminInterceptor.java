@@ -28,7 +28,7 @@ public class WebAdminInterceptor implements HandlerInterceptor {
         String token = CookieUtils.getCookieValue(request, "token");
         //token为空，一定没有登录
         if (token == null || token.isEmpty()) {
-            response.sendRedirect("http://127.0.0.1:8080/login?url=http://127.0.0.1:8081/login");
+            response.sendRedirect("http://127.0.0.1:9090/sso-server/login?url=http://127.0.0.1:9090/sso-client/login");
             return false;
         }
         return true;
@@ -70,7 +70,7 @@ public class WebAdminInterceptor implements HandlerInterceptor {
         }
         //二次确认是否有用户信息
         if (user == null) {
-            response.sendRedirect("http://127.0.0.1:8080/login?url=http://127.0.0.1:8081/login");
+            response.sendRedirect("http://127.0.0.1:9090/sso-server/login?url=http://127.0.0.1:9090/sso-client/login");
         }
     }
 }

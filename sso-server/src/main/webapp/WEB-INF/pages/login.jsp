@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<form action="/login" method="post">
+<form action="/sso-server/login" method="post">
     <input type="hidden" name="url" value="${url}" />
     用户名：<input name="userName" /><br/>
     密码：<input name="password" type="password" /><br/>
